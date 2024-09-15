@@ -12,6 +12,10 @@ import time
 from datetime import datetime, date, timezone, timedelta
 from enum import Enum
 from os.path import expanduser
+from os import environ
+import logging
+
+logging.basicConfig(level=getattr(logging, environ.get('LOGLEVEL', 'INFO').strip().upper()))
 
 '''
 Starting on May 2017, Yahoo financial has terminated its service on
@@ -59,29 +63,35 @@ class YahooQuote(object):
             begindate = now - 86400
 
         for ticker in tickers:
-            found = False
             while True:
                 r = self.session.get('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker,
                                      params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=self.crumb))
                 if r.ok:
-                    if 'timestamp' not in r.json()['chart']['result'][0] and autoextend_days > 0:
-                        # go back one more day
+                    chart = r.json()['chart']
+                    err = chart.get('error')
+                    result = chart.get('result')[0]
+                    if 'timestamp' not in result and autoextend_days > 0:
+                        # go back one more day to try to find data
                         begindate -= 86400
                         autoextend_days -= 1
-                    else:
-                        break
-                elif r.status_code == 404 and autoextend_days > 0:
-                    # go back one more day
-                    begindate -= 86400
-                    autoextend_days -= 1
-                elif r.status_code == 404:
-                    # ignore nonexistent ticker
+                        logging.debug('Moving start time back by 1 day to find real data (will try up to %d more days)' % autoextend_days)
+                        continue
+                    break
+
+                try:
+                    err = r.json()['chart']['error']
+                    code = err['code']
+                    desc = err['description']
+                except Exception:
                     break
                 else:
-                    r.raise_for_status()
+                    raise RuntimeError(err['code'], err['description'])
+            else:
+                # will only get here if we didn't get success, autoextend, or raise an error
+                r.raise_for_status()
+
             #print(r.cookies, r.url)
 
-            result = r.json()['chart']['result'][0]
             tz = timezone(timedelta(seconds=result['meta']['gmtoffset']), result['meta']['exchangeTimezoneName'])
             rows = list(zip(
                 [ticker] * len(result['timestamp']),
