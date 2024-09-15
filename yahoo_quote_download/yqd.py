@@ -64,7 +64,12 @@ class YahooQuote(object):
                 r = self.session.get('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker,
                                      params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=self.crumb))
                 if r.ok:
-                    break
+                    if 'timestamp' not in r.json()['chart']['result'][0] and autoextend_days > 0:
+                        # go back one more day
+                        begindate -= 86400
+                        autoextend_days -= 1
+                    else:
+                        break
                 elif r.status_code == 404 and autoextend_days > 0:
                     # go back one more day
                     begindate -= 86400
