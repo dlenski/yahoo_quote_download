@@ -82,8 +82,8 @@ class YahooQuote(object):
                     err = r.json()['chart']['error']
                     code = err['code']
                     desc = err['description']
-                except Exception:
-                    break
+                except Exception as exc:
+                    raise RuntimeError(f'Could not parse error from response ({r.status_code} {r.reason}): {r.text}') from None
                 else:
                     raise RuntimeError(err['code'], err['description'])
             else:
