@@ -31,14 +31,6 @@ Date, Open, High, Low, Close, Adjusted Close, Volume
 4. The order of the rows for splits/dividends seems random and is not chronically ordered.
 5. There are a number of holes (dates with prices marked as NULL), even in some of the SP500 stocks.
 
-# Installation
-
-Requires Python 3.x. Install with `pip`:
-
-```
-pip3 install https://github.com/dlenski/yahoo_quote_download/archive/master.zip
-```
-
 # Usage
 
 The first time you run `yqd`, it will extract a crumb from the web

@@ -35,8 +35,8 @@ class EventType(Enum):
     SPLIT = 'split'
 
 class YahooQuote(object):
-    def __init__(self, crumb=None, useragent=default_useragent):
-        self.session = requests.session()
+    def __init__(self, crumb=None, useragent=default_useragent, session=None):
+        self.session = requests.Session() if session is None else session
         self.session.headers['User-Agent'] = useragent
         self.session.headers['Accept'] =  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         self.crumb = crumb or self._get_crumb()

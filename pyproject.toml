@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "yahoo-quote-download"
+version = "0.1"
+description = "Yahoo Quote Downloader"
+authors = ["Daniel Lenski <dlenski@gmail.com>"]
+readme = "README.md"
+license = "Simplified BSD License"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.2.3"
+
+[tool.poetry.scripts]
+yqd = 'yahoo_quote_download.__main__:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
