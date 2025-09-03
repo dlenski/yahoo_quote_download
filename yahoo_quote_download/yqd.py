@@ -83,9 +83,9 @@ class YahooQuote(object):
                     code = err['code']
                     desc = err['description']
                 except Exception as exc:
-                    raise RuntimeError(f'Could not parse error from response ({r.status_code} {r.reason}): {r.text}') from None
+                    raise RuntimeError(ticker, f'Could not parse error from response ({r.status_code} {r.reason}): {r.text}') from None
                 else:
-                    raise RuntimeError(err['code'], err['description'])
+                    raise RuntimeError(ticker, err['description'], err['code'])
             else:
                 # will only get here if we didn't get success, autoextend, or raise an error
                 r.raise_for_status()

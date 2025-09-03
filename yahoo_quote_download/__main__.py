@@ -30,7 +30,12 @@ def main():
         begindate, max_rows = None, 1
     else:
         max_rows, begindate = None, int(time.time()-86400*args.days)
-    sys.stdout.writelines( yq.csv(args.ticker, events=args.events, headers=args.header, begindate=begindate, max_rows=max_rows, sep=args.sep) )
+
+    try:
+        sys.stdout.writelines( yq.csv(args.ticker, events=args.events, headers=args.header, begindate=begindate, max_rows=max_rows, sep=args.sep) )
+    except RuntimeError as exc:
+        ticker, desc, *code = exc.args
+        p.error(f'Error fetching data for ticker {ticker}: {desc}')
 
 if __name__=='__main__':
     main()
